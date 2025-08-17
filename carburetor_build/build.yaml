@@ -1,0 +1,6 @@
+builders:
+  carburetor:
+    import: "package:carburetor_build/carburetor_build.dart"
+    builder_factories: ["carburetorBuilder"]
+    build_extensions: { ".dart": [".carburetor.dart"] }
+    build_to: source
