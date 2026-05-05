@@ -2,16 +2,23 @@
 builders:
   carburetor_info_extractor:
     import: "package:carburetor_build/carburetor_build.dart"
-    builder_factories: ["carburetorInfoExtractor"]
-    build_extensions: { ".dart": [".carburetor-info.json"] }
-    applies_builders: ["carburetor_module_creator"]
+    builder_factories: [ "carburetorInfoExtractor" ]
+    build_extensions: { ".dart": [ ".carburetor-info.json" ] }
     auto_apply: dependents
     build_to: cache
+
+  carburetor_info_merge:
+    import: "package:carburetor_build/carburetor_build.dart"
+    builder_factories: [ "carburetorInfoMerge" ]
+    build_extensions: { "$lib$": [ "lib/src/carburetor.merged.json" ] }
+    required_inputs: [ ".carburetor-info.json" ]
+    auto_apply: dependents
+    build_to: cache
+
   carburetor_module_creator:
     import: "package:carburetor_build/carburetor_build.dart"
-    builder_factories: ["carburetorModuleCreator"]
-    build_extensions: { ".dart": [".carburetor.dart"] }
-    runs_before: ["carburetor_info_extractor"]
-    required_inputs: [".carburetor-info.json"]
+    builder_factories: [ "carburetorModuleCreator" ]
+    build_extensions: { ".dart": [ ".carburetor.dart" ] }
+    required_inputs: [ "lib/src/carburetor.merged.json" ]
     auto_apply: dependents
     build_to: source
