@@ -23,6 +23,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     final packageMapping = PackageImportMapping();
     {
       final imports = <Uri>{};
+      output.writeln('// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name');
       output.writeln('import \'package:carburetor/carburetor.dart\';');
       for (final provider in providers) {
         if (imports.contains(provider.clazz.uri)) {
@@ -30,15 +31,39 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
         }
         imports.add(provider.clazz.uri);
         final mapping = packageMapping[provider.clazz];
-        output.writeln('import \'${provider.clazz.uri}\' as $mapping;');
+        output
+          ..write('import \'')
+          ..write(provider.clazz.uri)
+          ..write('\' as ')
+          ..write(mapping)
+          ..writeln(';');
       }
     }
-    output.writeln('mixin ${_generateModuleClassName(element)}Module on CarburetorModule {');
+
+    output
+      ..write('mixin ')
+      ..write(_generateModuleClassName(element))
+      ..writeln(' on CarburetorModule {');
+
+    for (final provider in providers) {
+      _generateGetter(output: output, mapping: packageMapping, providers: providers, provider: provider);
+    }
+
+    output.writeln('@override');
+    output.writeln('T get<T>() {');
+    output.writeln('return switch (T) {');
     for (final provider in providers) {
       final className = _genClassName(mapping: packageMapping, clazz: provider.clazz);
-      final getterName = _genClassGetterName(mapping: packageMapping, clazz: provider.clazz);
-      output.writeln('$className $getterName() => throw UnimplementedError(\'Not implemented yet\');');
+      output
+        ..write(className)
+        ..writeln(' _ => ')
+        ..write(_genClassGetterName(mapping: packageMapping, clazz: provider.clazz))
+        ..writeln('() as T,');
     }
+    output.writeln('_ => throw Exception(\'No provider found for type \$T\'),');
+    output.writeln('};');
+    output.writeln('}');
+
     output.writeln('}');
 
     return output.toString();
@@ -54,6 +79,99 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
 
   String _genClassGetterName({required PackageImportMapping mapping, required ProvideClass clazz}) {
     return '_get_${mapping[clazz]}_${clazz.name}';
+  }
+
+  void _generateGetter({
+    required StringBuffer output,
+    required PackageImportMapping mapping,
+    required List<ProvideInfo> providers,
+    required ProvideInfo provider,
+  }) {
+    if (provider.provide.singleton) {
+      return _generateGetterForSingleton(output: output, mapping: mapping, providers: providers, provider: provider);
+    }
+    return _generateGetterForInstance(output: output, mapping: mapping, providers: providers, provider: provider);
+  }
+
+  void _generateGetterForSingleton({
+    required StringBuffer output,
+    required PackageImportMapping mapping,
+    required List<ProvideInfo> providers,
+    required ProvideInfo provider,
+  }) {
+    final className = _genClassName(mapping: mapping, clazz: provider.clazz);
+    final instanceName = '_instance_${mapping[provider.clazz]}_${provider.clazz.name}';
+    final getterName = _genClassGetterName(mapping: mapping, clazz: provider.clazz);
+    output
+      ..write(className)
+      ..write('? ')
+      ..write(instanceName)
+      ..writeln(';');
+
+    output
+      ..write(className)
+      ..write(' ')
+      ..write(getterName)
+      ..writeln('() {');
+
+    output
+      ..write(instanceName)
+      ..write(' ??= ');
+    _generateConstructor(output: output, mapping: mapping, providers: providers, provider: provider);
+    output.writeln(';');
+
+    output
+      ..write('return ')
+      ..write(instanceName)
+      ..writeln('!;');
+
+    output.writeln('}');
+  }
+
+  void _generateGetterForInstance({
+    required StringBuffer output,
+    required PackageImportMapping mapping,
+    required List<ProvideInfo> providers,
+    required ProvideInfo provider,
+  }) {
+    output
+      ..write(_genClassName(mapping: mapping, clazz: provider.clazz))
+      ..write(' ')
+      ..write(_genClassGetterName(mapping: mapping, clazz: provider.clazz))
+      ..writeln('() {');
+
+    output.write('return ');
+    _generateConstructor(output: output, mapping: mapping, providers: providers, provider: provider);
+    output.writeln(';');
+
+    output.writeln('}');
+  }
+
+  void _generateConstructor({
+    required StringBuffer output,
+    required PackageImportMapping mapping,
+    required List<ProvideInfo> providers,
+    required ProvideInfo provider,
+  }) {
+    output.write(_genClassName(mapping: mapping, clazz: provider.clazz));
+    output.write('.');
+    output.write(provider.constructor.name);
+    output.writeln('(');
+    var first = true;
+    for (final parameter in provider.constructor.parameters) {
+      if (first) {
+        first = false;
+      } else {
+        output.write(',');
+      }
+      if (parameter.name != null) {
+        output.write(parameter.name);
+        output.write(': ');
+      }
+      output.write(_genClassGetterName(mapping: mapping, clazz: parameter.type));
+      output.write('()');
+    }
+    output.writeln(')');
   }
 
   Future<List<ProvideInfo>> _loadProviders(BuildStep buildStep) async {
