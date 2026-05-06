@@ -42,8 +42,8 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
 
     output
       ..write('mixin ')
-      ..write(_generateModuleClassName(element))
-      ..writeln(' on CarburetorModule {');
+      ..write(element.displayName)
+      ..writeln('Implementation on CarburetorModule {');
 
     for (final provider in providers) {
       _generateGetter(output: output, mapping: packageMapping, providers: providers, provider: provider);
@@ -53,11 +53,10 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     output.writeln('T get<T>() {');
     output.writeln('return switch (T) {');
     for (final provider in providers) {
-      final className = _genClassName(mapping: packageMapping, clazz: provider.clazz);
       output
-        ..write(className)
+        ..writeClassName(mapping: packageMapping, clazz: provider.clazz)
         ..writeln(' _ => ')
-        ..write(_genClassGetterName(mapping: packageMapping, clazz: provider.clazz))
+        ..writeClassGetterName(mapping: packageMapping, clazz: provider.clazz)
         ..writeln('() as T,');
     }
     output.writeln('_ => throw Exception(\'No provider found for type \$T\'),');
@@ -67,18 +66,6 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     output.writeln('}');
 
     return output.toString();
-  }
-
-  String _generateModuleClassName(Element2 element) {
-    return '${element.displayName}Implementation';
-  }
-
-  String _genClassName({required PackageImportMapping mapping, required ProvideClass clazz}) {
-    return '${mapping[clazz]}.${clazz.name}';
-  }
-
-  String _genClassGetterName({required PackageImportMapping mapping, required ProvideClass clazz}) {
-    return '_get_${mapping[clazz]}_${clazz.name}';
   }
 
   void _generateGetter({
@@ -99,30 +86,27 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     required List<ProvideInfo> providers,
     required ProvideInfo provider,
   }) {
-    final className = _genClassName(mapping: mapping, clazz: provider.clazz);
-    final instanceName = '_instance_${mapping[provider.clazz]}_${provider.clazz.name}';
-    final getterName = _genClassGetterName(mapping: mapping, clazz: provider.clazz);
     output
-      ..write(className)
+      ..writeClassName(mapping: mapping, clazz: provider.clazz)
       ..write('? ')
-      ..write(instanceName)
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
       ..writeln(';');
 
     output
-      ..write(className)
+      ..writeClassName(mapping: mapping, clazz: provider.clazz)
       ..write(' ')
-      ..write(getterName)
+      ..writeClassGetterName(mapping: mapping, clazz: provider.clazz)
       ..writeln('() {');
 
     output
-      ..write(instanceName)
-      ..write(' ??= ');
-    _generateConstructor(output: output, mapping: mapping, providers: providers, provider: provider);
-    output.writeln(';');
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
+      ..write(' ??= ')
+      ..writeClassConstructor(mapping: mapping, providers: providers, provider: provider)
+      ..writeln(';');
 
     output
       ..write('return ')
-      ..write(instanceName)
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
       ..writeln('!;');
 
     output.writeln('}');
@@ -135,43 +119,17 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     required ProvideInfo provider,
   }) {
     output
-      ..write(_genClassName(mapping: mapping, clazz: provider.clazz))
+      ..writeClassName(mapping: mapping, clazz: provider.clazz)
       ..write(' ')
-      ..write(_genClassGetterName(mapping: mapping, clazz: provider.clazz))
+      ..writeClassGetterName(mapping: mapping, clazz: provider.clazz)
       ..writeln('() {');
 
-    output.write('return ');
-    _generateConstructor(output: output, mapping: mapping, providers: providers, provider: provider);
-    output.writeln(';');
+    output
+      ..write('return ')
+      ..writeClassConstructor(mapping: mapping, providers: providers, provider: provider)
+      ..writeln(';');
 
     output.writeln('}');
-  }
-
-  void _generateConstructor({
-    required StringBuffer output,
-    required PackageImportMapping mapping,
-    required List<ProvideInfo> providers,
-    required ProvideInfo provider,
-  }) {
-    output.write(_genClassName(mapping: mapping, clazz: provider.clazz));
-    output.write('.');
-    output.write(provider.constructor.name);
-    output.writeln('(');
-    var first = true;
-    for (final parameter in provider.constructor.parameters) {
-      if (first) {
-        first = false;
-      } else {
-        output.write(',');
-      }
-      if (parameter.name != null) {
-        output.write(parameter.name);
-        output.write(': ');
-      }
-      output.write(_genClassGetterName(mapping: mapping, clazz: parameter.type));
-      output.write('()');
-    }
-    output.writeln(')');
   }
 
   Future<List<ProvideInfo>> _loadProviders(BuildStep buildStep) async {
@@ -222,5 +180,53 @@ class PackageImportMapping {
       return '${_kMappingValues[0]}${buffer.toString()}';
     }
     return buffer.toString();
+  }
+}
+
+extension on StringSink {
+  void writeClassName({required PackageImportMapping mapping, required ProvideClass clazz}) {
+    write(mapping[clazz]);
+    write('.');
+    write(clazz.name);
+  }
+
+  void writeClassGetterName({required PackageImportMapping mapping, required ProvideClass clazz}) {
+    write('_get_');
+    write(mapping[clazz]);
+    write('_');
+    write(clazz.name);
+  }
+
+  void writeClassInstanceName({required PackageImportMapping mapping, required ProvideClass clazz}) {
+    write('_instance_');
+    write(mapping[clazz]);
+    write('_');
+    write(clazz.name);
+  }
+
+  void writeClassConstructor({
+    required PackageImportMapping mapping,
+    required List<ProvideInfo> providers,
+    required ProvideInfo provider,
+  }) {
+    writeClassName(mapping: mapping, clazz: provider.clazz);
+    write('.');
+    write(provider.constructor.name);
+    writeln('(');
+    var first = true;
+    for (final parameter in provider.constructor.parameters) {
+      if (first) {
+        first = false;
+      } else {
+        write(',');
+      }
+      if (parameter.name != null) {
+        write(parameter.name);
+        write(': ');
+      }
+      writeClassGetterName(mapping: mapping, clazz: parameter.type);
+      write('()');
+    }
+    writeln(')');
   }
 }
