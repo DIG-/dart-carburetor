@@ -8,6 +8,7 @@ part 'provide.g.dart';
 class ProvideJsonConverter extends JsonConverter<Provide, Json> {
   static const _kSingleton = 'singleton';
   static const _kLazy = 'lazy';
+  static const _kWeak = 'weak';
 
   const ProvideJsonConverter();
 
@@ -16,6 +17,7 @@ class ProvideJsonConverter extends JsonConverter<Provide, Json> {
     return {
       _kSingleton: provide.singleton,
       _kLazy: provide.lazy, //
+      _kWeak: provide.weak, //
     };
   }
 
@@ -24,6 +26,7 @@ class ProvideJsonConverter extends JsonConverter<Provide, Json> {
     return Provide(
       singleton: json[_kSingleton] as bool? ?? false,
       lazy: json[_kLazy] as bool? ?? false, //
+      weak: json[_kWeak] as bool? ?? false, //
     );
   }
 }

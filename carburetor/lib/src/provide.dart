@@ -4,5 +4,6 @@ import 'package:meta/meta_meta.dart';
 class Provide {
   final bool singleton;
   final bool lazy;
-  const Provide({this.singleton = false, this.lazy = true});
+  final bool weak;
+  const Provide({this.singleton = false, this.lazy = true, this.weak = false});
 }

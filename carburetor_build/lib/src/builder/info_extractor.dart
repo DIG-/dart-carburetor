@@ -58,6 +58,7 @@ class InfoExtractorBuilder extends Builder {
       provide: Provide(
         singleton: ann.getField('singleton')?.toBoolValue() ?? false,
         lazy: ann.getField('lazy')?.toBoolValue() ?? false,
+        weak: ann.getField('weak')?.toBoolValue() ?? false,
       ),
       clazz: ProvideClass(name: element.name3!, uri: element.library2.uri),
       constructor: ProvideConstructor(
