@@ -75,12 +75,20 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     required ProvideInfo provider,
   }) {
     if (provider.provide.singleton) {
+      if (provider.provide.lazy) {
+        return _generateGetterForSingletonLazy(
+          output: output,
+          mapping: mapping,
+          providers: providers,
+          provider: provider,
+        );
+      }
       return _generateGetterForSingleton(output: output, mapping: mapping, providers: providers, provider: provider);
     }
     return _generateGetterForInstance(output: output, mapping: mapping, providers: providers, provider: provider);
   }
 
-  void _generateGetterForSingleton({
+  void _generateGetterForSingletonLazy({
     required StringBuffer output,
     required PackageImportMapping mapping,
     required List<ProvideInfo> providers,
@@ -108,6 +116,35 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       ..write('return ')
       ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
       ..writeln('!;');
+
+    output.writeln('}');
+  }
+
+  void _generateGetterForSingleton({
+    required StringBuffer output,
+    required PackageImportMapping mapping,
+    required List<ProvideInfo> providers,
+    required ProvideInfo provider,
+  }) {
+    output
+      ..write('late final ')
+      ..writeClassName(mapping: mapping, clazz: provider.clazz)
+      ..write(' ')
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
+      ..write(' = ')
+      ..writeClassConstructor(mapping: mapping, providers: providers, provider: provider)
+      ..writeln(';');
+
+    output
+      ..writeClassName(mapping: mapping, clazz: provider.clazz)
+      ..write(' ')
+      ..writeClassGetterName(mapping: mapping, clazz: provider.clazz)
+      ..writeln('() {');
+
+    output
+      ..write('return ')
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
+      ..writeln(';');
 
     output.writeln('}');
   }
