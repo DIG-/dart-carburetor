@@ -50,7 +50,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     }
 
     output.writeln('@override');
-    output.writeln('T get<T>() {');
+    output.writeln('T get<T extends Object>() {');
     output.writeln('return switch (T) {');
     for (final provider in providers) {
       output

@@ -8,5 +8,5 @@ class Module {
 abstract class CarburetorModule {
   const CarburetorModule();
 
-  T get<T>();
+  T get<T extends Object>();
 }
