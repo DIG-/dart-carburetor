@@ -41,7 +41,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     }
 
     output
-      ..write('mixin ')
+      ..write('mixin \$')
       ..write(element.displayName)
       ..writeln('Implementation on CarburetorModule {');
 
