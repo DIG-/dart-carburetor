@@ -75,6 +75,14 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     required ProvideInfo provider,
   }) {
     if (provider.provide.singleton) {
+      if (provider.provide.weak) {
+        return _generateGetterForSingletonWeak(
+          output: output,
+          mapping: mapping,
+          providers: providers,
+          provider: provider,
+        );
+      }
       if (provider.provide.lazy) {
         return _generateGetterForSingletonLazy(
           output: output,
@@ -86,6 +94,48 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       return _generateGetterForSingleton(output: output, mapping: mapping, providers: providers, provider: provider);
     }
     return _generateGetterForInstance(output: output, mapping: mapping, providers: providers, provider: provider);
+  }
+
+  void _generateGetterForSingletonWeak({
+    required StringBuffer output,
+    required PackageImportMapping mapping,
+    required List<ProvideInfo> providers,
+    required ProvideInfo provider,
+  }) {
+    output
+      ..write('WeakReference<')
+      ..writeClassName(mapping: mapping, clazz: provider.clazz)
+      ..write('>? ')
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
+      ..writeln(';');
+
+    output
+      ..writeClassName(mapping: mapping, clazz: provider.clazz)
+      ..write(' ')
+      ..writeClassGetterName(mapping: mapping, clazz: provider.clazz)
+      ..writeln('() {');
+
+    output
+      ..write('var instance = ')
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
+      ..writeln('?.target;');
+
+    output.writeln('if (instance != null) {');
+    output.writeln('return instance!;');
+    output.writeln('}');
+
+    output
+      ..write('instance = ')
+      ..writeClassConstructor(mapping: mapping, providers: providers, provider: provider)
+      ..writeln(';');
+
+    output
+      ..writeClassInstanceName(mapping: mapping, clazz: provider.clazz)
+      ..writeln(' = WeakReference(instance);');
+
+    output.writeln('return instance!;');
+
+    output.writeln('}');
   }
 
   void _generateGetterForSingletonLazy({
