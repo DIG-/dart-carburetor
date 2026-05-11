@@ -61,6 +61,15 @@ class ProvideClass {
   factory ProvideClass.fromJson(Json json) => _$ProvideClassFromJson(json);
 
   Json toJson() => _$ProvideClassToJson(this);
+
+  @override
+  int get hashCode => Object.hash(name, uri);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ProvideClass && other.name == name && other.uri == uri;
+  }
 }
 
 @JsonSerializable()
