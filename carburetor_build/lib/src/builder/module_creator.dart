@@ -90,6 +90,9 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
   void _generateGetter({required StringBuffer output, required CreatorContext context, required ProvideInfo provider}) {
     if (provider.provide.async) {
       if (provider.provide.singleton) {
+        if (provider.provide.lazy) {
+          return _generateGetterForSingletonLazyAsync(output: output, context: context, provider: provider);
+        }
         return _generateGetterForSingletonAsync(output: output, context: context, provider: provider);
       }
       return _generateGetterForInstanceAsync(output: output, context: context, provider: provider);
@@ -292,6 +295,63 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       ..write('return ')
       ..writeClassInstanceName(context: context, clazz: provider.clazz)
       ..writeln('_creator;');
+
+    output.writeln('}');
+  }
+
+  void _generateGetterForSingletonLazyAsync({
+    required StringBuffer output,
+    required CreatorContext context,
+    required ProvideInfo provider,
+  }) {
+    output
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('? ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(';');
+
+    output
+      ..write('Future<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('>? ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('_creator;');
+
+    output
+      ..write('Future<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('> ')
+      ..writeClassGetterName(context: context, clazz: provider.clazz)
+      ..writeln('() async {');
+
+    output
+      ..write('if (')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(' != null) {');
+
+    output
+      ..write('return ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('!;');
+
+    output.writeln('}');
+
+    output
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..write('_creator ??= ')
+      ..writeClassConstructorFuture(context: context, provider: provider)
+      ..writeln('.then((value) {')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(' = value;')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('_creator = null;')
+      ..writeln('return value;')
+      ..writeln('});');
+
+    output
+      ..write('return ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('_creator!;');
 
     output.writeln('}');
   }
