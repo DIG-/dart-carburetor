@@ -21,7 +21,9 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
   Future<String?> generateForAnnotatedElement(Element2 element, ConstantReader annotation, BuildStep buildStep) async {
     final output = StringBuffer();
     final context = CreatorContext.fromProviders(await _loadProviders(buildStep));
-    output.writeln('// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name');
+    output.writeln(
+      '// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name,type_literal_in_constant_pattern',
+    );
     output.writeln('import \'package:carburetor/carburetor.dart\';');
     output.writeln('import \'package:carburetor/exception.dart\';');
     for (final MapEntry(key: import, value: alias) in context.getPackageImportMapping().entries) {
@@ -49,13 +51,13 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       if (provider.provide.async) {
         output
           ..writeClassName(context: context, clazz: provider.clazz)
-          ..write(' _ => throw CarburetorProviderIsAsyncException(\'')
+          ..write(' => throw CarburetorProviderIsAsyncException(\'')
           ..write(provider.clazz.name)
           ..writeln(' is async. Should use getAsync()\'),');
       } else {
         output
           ..writeClassName(context: context, clazz: provider.clazz)
-          ..writeln(' _ => ')
+          ..writeln(' => ')
           ..writeClassGetterName(context: context, clazz: provider.clazz)
           ..writeln('() as T,');
       }
@@ -71,7 +73,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       if (provider.provide.async) {
         output
           ..writeClassName(context: context, clazz: provider.clazz)
-          ..writeln(' _ => (await ')
+          ..writeln(' => (await ')
           ..writeClassGetterName(context: context, clazz: provider.clazz)
           ..writeln('()) as T,');
       } else {
