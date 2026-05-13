@@ -5,5 +5,6 @@ class Provide {
   final bool singleton;
   final bool lazy;
   final bool weak;
-  const Provide({this.singleton = false, this.lazy = true, this.weak = false});
+  final bool async;
+  const Provide({this.singleton = false, this.lazy = true, this.weak = false, this.async = false});
 }

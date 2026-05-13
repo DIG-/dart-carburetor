@@ -18,6 +18,11 @@ class SampleChildClass {
   const SampleChildClass();
 }
 
+@Provide(async: true)
+class SampleAsyncClass {
+  const SampleAsyncClass();
+}
+
 @Module()
 class SampleModule extends CarburetorModule with $SampleModuleImplementation {
   static final instance = SampleModule();

@@ -23,6 +23,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     final context = CreatorContext.fromProviders(await _loadProviders(buildStep));
     output.writeln('// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name');
     output.writeln('import \'package:carburetor/carburetor.dart\';');
+    output.writeln('import \'package:carburetor/exception.dart\';');
     for (final MapEntry(key: import, value: alias) in context.getPackageImportMapping().entries) {
       output
         ..write('import \'')
@@ -45,13 +46,39 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     output.writeln('T get<T extends Object>() {');
     output.writeln('return switch (T) {');
     for (final provider in context.getProviders()) {
-      output
-        ..writeClassName(context: context, clazz: provider.clazz)
-        ..writeln(' _ => ')
-        ..writeClassGetterName(context: context, clazz: provider.clazz)
-        ..writeln('() as T,');
+      if (provider.provide.async) {
+        output
+          ..writeClassName(context: context, clazz: provider.clazz)
+          ..write(' _ => throw CarburetorProviderIsAsyncException(\'')
+          ..write(provider.clazz.name)
+          ..writeln(' is async. Should use getAsync()\'),');
+      } else {
+        output
+          ..writeClassName(context: context, clazz: provider.clazz)
+          ..writeln(' _ => ')
+          ..writeClassGetterName(context: context, clazz: provider.clazz)
+          ..writeln('() as T,');
+      }
     }
-    output.writeln('_ => throw Exception(\'No provider found for type \$T\'),');
+    output.writeln('_ => throw CarburetorException(\'No provider found for type \$T\'),');
+    output.writeln('};');
+    output.writeln('}');
+
+    output.writeln('@override');
+    output.writeln('Future<T> getAsync<T extends Object>() async {');
+    output.writeln('return switch (T) {');
+    for (final provider in context.getProviders()) {
+      if (provider.provide.async) {
+        output
+          ..writeClassName(context: context, clazz: provider.clazz)
+          ..writeln(' _ => (await ')
+          ..writeClassGetterName(context: context, clazz: provider.clazz)
+          ..writeln('()) as T,');
+      } else {
+        // Nothing to write
+      }
+    }
+    output.writeln('_ => get<T>(),');
     output.writeln('};');
     output.writeln('}');
 
@@ -61,6 +88,9 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
   }
 
   void _generateGetter({required StringBuffer output, required CreatorContext context, required ProvideInfo provider}) {
+    if (provider.provide.async) {
+      return _generateGetterForInstanceAsync(output: output, context: context, provider: provider);
+    }
     if (provider.provide.singleton) {
       if (provider.provide.weak) {
         return _generateGetterForSingletonWeak(output: output, context: context, provider: provider);
@@ -102,7 +132,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
 
     output
       ..write('instance = ')
-      ..writeClassConstructor(context: context, provider: provider)
+      ..writeClassConstructor(context: context, provider: provider, async: false)
       ..writeln(';');
 
     output
@@ -134,7 +164,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     output
       ..writeClassInstanceName(context: context, clazz: provider.clazz)
       ..write(' ??= ')
-      ..writeClassConstructor(context: context, provider: provider)
+      ..writeClassConstructor(context: context, provider: provider, async: false)
       ..writeln(';');
 
     output
@@ -156,7 +186,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       ..write(' ')
       ..writeClassInstanceName(context: context, clazz: provider.clazz)
       ..write(' = ')
-      ..writeClassConstructor(context: context, provider: provider)
+      ..writeClassConstructor(context: context, provider: provider, async: false)
       ..writeln(';');
 
     output
@@ -186,7 +216,27 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
 
     output
       ..write('return ')
-      ..writeClassConstructor(context: context, provider: provider)
+      ..writeClassConstructor(context: context, provider: provider, async: false)
+      ..writeln(';');
+
+    output.writeln('}');
+  }
+
+  void _generateGetterForInstanceAsync({
+    required StringBuffer output,
+    required CreatorContext context,
+    required ProvideInfo provider,
+  }) {
+    output
+      ..write('Future<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('> ')
+      ..writeClassGetterName(context: context, clazz: provider.clazz)
+      ..writeln('() async {');
+
+    output
+      ..write('return ')
+      ..writeClassConstructor(context: context, provider: provider, async: true)
       ..writeln(';');
 
     output.writeln('}');
@@ -233,7 +283,7 @@ extension on StringSink {
     write(clazz.name);
   }
 
-  void writeClassConstructor({required CreatorContext context, required ProvideInfo provider}) {
+  void writeClassConstructor({required CreatorContext context, required ProvideInfo provider, required bool async}) {
     writeClassName(context: context, clazz: provider.clazz);
     write('.');
     write(provider.constructor.name);
@@ -248,6 +298,14 @@ extension on StringSink {
       if (parameter.name != null) {
         write(parameter.name);
         write(': ');
+      }
+      if (context.getProvider(clazz: parameter.type).provide.async) {
+        if (!async) {
+          throw Exception(
+            'Cannot use an async provider as a dependency of a non-async provider. Parameter: ${parameter.name}, Provider: ${provider.clazz.name}',
+          );
+        }
+        write('await ');
       }
       writeClassGetterName(context: context, clazz: parameter.type);
       write('()');

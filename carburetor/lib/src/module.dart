@@ -9,4 +9,5 @@ abstract class CarburetorModule {
   const CarburetorModule();
 
   T get<T extends Object>();
+  Future<T> getAsync<T extends Object>();
 }

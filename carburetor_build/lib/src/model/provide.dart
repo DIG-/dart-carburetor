@@ -9,6 +9,7 @@ class ProvideJsonConverter extends JsonConverter<Provide, Json> {
   static const _kSingleton = 'singleton';
   static const _kLazy = 'lazy';
   static const _kWeak = 'weak';
+  static const _kAsync = 'async';
 
   const ProvideJsonConverter();
 
@@ -18,6 +19,7 @@ class ProvideJsonConverter extends JsonConverter<Provide, Json> {
       _kSingleton: provide.singleton,
       _kLazy: provide.lazy, //
       _kWeak: provide.weak, //
+      _kAsync: provide.async, //
     };
   }
 
@@ -27,6 +29,7 @@ class ProvideJsonConverter extends JsonConverter<Provide, Json> {
       singleton: json[_kSingleton] as bool? ?? false,
       lazy: json[_kLazy] as bool? ?? false, //
       weak: json[_kWeak] as bool? ?? false, //
+      async: json[_kAsync] as bool? ?? false, //
     );
   }
 }
