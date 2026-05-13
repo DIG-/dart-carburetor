@@ -476,7 +476,8 @@ extension on StringSink {
       if (context.getProvider(clazz: parameter.type).provide.async) {
         if (!async) {
           throw Exception(
-            'Cannot use an async provider as a dependency of a non-async provider. Parameter: ${parameter.name}, Provider: ${provider.clazz.name}',
+            'Cannot use an async provider as a dependency of a non-async provider.'
+            ' Class ${provider.clazz.name} requires ${parameter.type.name}',
           );
         }
         write('await ');
