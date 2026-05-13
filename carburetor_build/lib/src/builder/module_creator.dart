@@ -136,7 +136,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       ..writeln('?.target;');
 
     output.writeln('if (instance != null) {');
-    output.writeln('return instance!;');
+    output.writeln('return instance;');
     output.writeln('}');
 
     output
@@ -148,7 +148,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       ..writeClassInstanceName(context: context, clazz: provider.clazz)
       ..writeln(' = WeakReference(instance);');
 
-    output.writeln('return instance!;');
+    output.writeln('return instance;');
 
     output.writeln('}');
   }

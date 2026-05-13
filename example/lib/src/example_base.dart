@@ -3,24 +3,45 @@ import 'package:example/src/example_base.carburetor.dart';
 
 @Provide()
 class SampleClass {
-  final SampleChildClass child;
-
+  final SampleSingletonClass child;
   const SampleClass(this.child);
-
-  /// A method that does something.
-  void doSomething() {
-    // Implementation goes here.
-  }
 }
 
 @Provide(singleton: true)
-class SampleChildClass {
-  const SampleChildClass();
+class SampleSingletonClass {
+  const SampleSingletonClass();
+}
+
+@Provide(singleton: true, lazy: false)
+class SampleSingletonNonLazyClass {
+  const SampleSingletonNonLazyClass();
+}
+
+@Provide(singleton: true, weak: true)
+class SampleSingletonWeakClass {
+  const SampleSingletonWeakClass();
 }
 
 @Provide(async: true)
 class SampleAsyncClass {
-  const SampleAsyncClass();
+  final SampleSingletonClass child;
+  final SampleAsyncSingletonClass child2;
+  const SampleAsyncClass(this.child, {required this.child2});
+}
+
+@Provide(async: true, singleton: true)
+class SampleAsyncSingletonClass {
+  const SampleAsyncSingletonClass();
+}
+
+@Provide(async: true, singleton: true, lazy: false)
+class SampleAsyncSingletonNonLazyClass {
+  const SampleAsyncSingletonNonLazyClass();
+}
+
+@Provide(async: true, singleton: true, weak: true)
+class SampleAsyncSingletonWeakClass {
+  const SampleAsyncSingletonWeakClass();
 }
 
 @Module()
