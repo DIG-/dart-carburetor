@@ -5,7 +5,7 @@
 // ModuleCreatorGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name
+// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name,type_literal_in_constant_pattern
 import 'package:carburetor/carburetor.dart';
 import 'package:carburetor/exception.dart';
 import 'package:example/src/example_base.dart' as aa;
@@ -105,24 +105,24 @@ mixin $SampleModuleImplementation on CarburetorModule {
   @override
   T get<T extends Object>() {
     return switch (T) {
-      aa.SampleClass _ => _get_aa_SampleClass() as T,
-      aa.SampleSingletonClass _ => _get_aa_SampleSingletonClass() as T,
-      aa.SampleSingletonNonLazyClass _ =>
+      aa.SampleClass => _get_aa_SampleClass() as T,
+      aa.SampleSingletonClass => _get_aa_SampleSingletonClass() as T,
+      aa.SampleSingletonNonLazyClass =>
         _get_aa_SampleSingletonNonLazyClass() as T,
-      aa.SampleSingletonWeakClass _ => _get_aa_SampleSingletonWeakClass() as T,
-      aa.SampleAsyncClass _ =>
+      aa.SampleSingletonWeakClass => _get_aa_SampleSingletonWeakClass() as T,
+      aa.SampleAsyncClass =>
         throw CarburetorProviderIsAsyncException(
           'SampleAsyncClass is async. Should use getAsync()',
         ),
-      aa.SampleAsyncSingletonClass _ =>
+      aa.SampleAsyncSingletonClass =>
         throw CarburetorProviderIsAsyncException(
           'SampleAsyncSingletonClass is async. Should use getAsync()',
         ),
-      aa.SampleAsyncSingletonNonLazyClass _ =>
+      aa.SampleAsyncSingletonNonLazyClass =>
         throw CarburetorProviderIsAsyncException(
           'SampleAsyncSingletonNonLazyClass is async. Should use getAsync()',
         ),
-      aa.SampleAsyncSingletonWeakClass _ =>
+      aa.SampleAsyncSingletonWeakClass =>
         throw CarburetorProviderIsAsyncException(
           'SampleAsyncSingletonWeakClass is async. Should use getAsync()',
         ),
@@ -133,12 +133,12 @@ mixin $SampleModuleImplementation on CarburetorModule {
   @override
   Future<T> getAsync<T extends Object>() async {
     return switch (T) {
-      aa.SampleAsyncClass _ => (await _get_aa_SampleAsyncClass()) as T,
-      aa.SampleAsyncSingletonClass _ =>
+      aa.SampleAsyncClass => (await _get_aa_SampleAsyncClass()) as T,
+      aa.SampleAsyncSingletonClass =>
         (await _get_aa_SampleAsyncSingletonClass()) as T,
-      aa.SampleAsyncSingletonNonLazyClass _ =>
+      aa.SampleAsyncSingletonNonLazyClass =>
         (await _get_aa_SampleAsyncSingletonNonLazyClass()) as T,
-      aa.SampleAsyncSingletonWeakClass _ =>
+      aa.SampleAsyncSingletonWeakClass =>
         (await _get_aa_SampleAsyncSingletonWeakClass()) as T,
       _ => get<T>(),
     };
