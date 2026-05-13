@@ -89,6 +89,9 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
 
   void _generateGetter({required StringBuffer output, required CreatorContext context, required ProvideInfo provider}) {
     if (provider.provide.async) {
+      if (provider.provide.singleton) {
+        return _generateGetterForSingletonAsync(output: output, context: context, provider: provider);
+      }
       return _generateGetterForInstanceAsync(output: output, context: context, provider: provider);
     }
     if (provider.provide.singleton) {
@@ -242,6 +245,57 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     output.writeln('}');
   }
 
+  void _generateGetterForSingletonAsync({
+    required StringBuffer output,
+    required CreatorContext context,
+    required ProvideInfo provider,
+  }) {
+    output
+      ..write('late final Future<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('> ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..write('_creator = ')
+      ..writeClassConstructorFuture(context: context, provider: provider)
+      ..writeln('.then((value) {')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(' = value;')
+      ..writeln('return value;')
+      ..writeln('});');
+
+    output
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('? ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(';');
+
+    output
+      ..write('Future<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('> ')
+      ..writeClassGetterName(context: context, clazz: provider.clazz)
+      ..writeln('() async {');
+
+    output
+      ..write('if (')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(' != null) {');
+
+    output
+      ..write('return ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('!;');
+
+    output.writeln('}');
+
+    output
+      ..write('return ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('_creator;');
+
+    output.writeln('}');
+  }
+
   Future<List<ProvideInfo>> _loadProviders(BuildStep buildStep) async {
     if (_providers.isNotEmpty) {
       return _providers;
@@ -310,6 +364,12 @@ extension on StringSink {
       writeClassGetterName(context: context, clazz: parameter.type);
       write('()');
     }
+    writeln(')');
+  }
+
+  void writeClassConstructorFuture({required CreatorContext context, required ProvideInfo provider}) {
+    write('Future(() async => ');
+    writeClassConstructor(context: context, provider: provider, async: true);
     writeln(')');
   }
 }
