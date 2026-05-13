@@ -90,6 +90,9 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
   void _generateGetter({required StringBuffer output, required CreatorContext context, required ProvideInfo provider}) {
     if (provider.provide.async) {
       if (provider.provide.singleton) {
+        if (provider.provide.weak) {
+          return _generateGetterForSingletonWeakAsync(output: output, context: context, provider: provider);
+        }
         if (provider.provide.lazy) {
           return _generateGetterForSingletonLazyAsync(output: output, context: context, provider: provider);
         }
@@ -343,6 +346,63 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       ..writeln('.then((value) {')
       ..writeClassInstanceName(context: context, clazz: provider.clazz)
       ..writeln(' = value;')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('_creator = null;')
+      ..writeln('return value;')
+      ..writeln('});');
+
+    output
+      ..write('return ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('_creator!;');
+
+    output.writeln('}');
+  }
+
+  void _generateGetterForSingletonWeakAsync({
+    required StringBuffer output,
+    required CreatorContext context,
+    required ProvideInfo provider,
+  }) {
+    output
+      ..write('WeakReference<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('>? ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(';');
+
+    output
+      ..write('Future<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('>? ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('_creator;');
+
+    output
+      ..write('Future<')
+      ..writeClassName(context: context, clazz: provider.clazz)
+      ..write('> ')
+      ..writeClassGetterName(context: context, clazz: provider.clazz)
+      ..writeln('() async {');
+
+    output
+      ..write('final instance = ')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln('?.target;');
+
+    output.writeln('if (instance != null) {');
+
+    output.writeln('return instance;');
+
+    output.writeln('}');
+
+    output
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..write('_creator ??= ')
+      ..writeClassConstructorFuture(context: context, provider: provider)
+      ..writeln('.then((value) {')
+      ..writeClassInstanceName(context: context, clazz: provider.clazz)
+      ..writeln(' = WeakReference(value);')
       ..writeClassInstanceName(context: context, clazz: provider.clazz)
       ..writeln('_creator = null;')
       ..writeln('return value;')
