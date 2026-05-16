@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
-import 'package:carburetor/carburetor.dart';
+import 'package:carburetor/module.dart';
 import 'package:carburetor_build/src/model/creator_context.dart';
 import 'package:carburetor_build/src/model/json.dart';
 import 'package:carburetor_build/src/model/provide.dart';
@@ -24,8 +24,8 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
     output.writeln(
       '// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name,type_literal_in_constant_pattern',
     );
-    output.writeln('import \'package:carburetor/carburetor.dart\';');
     output.writeln('import \'package:carburetor/exceptions.dart\';');
+    output.writeln('import \'package:carburetor/module.dart\';');
     for (final MapEntry(key: import, value: alias) in context.getPackageImportMapping().entries) {
       output
         ..write('import \'')

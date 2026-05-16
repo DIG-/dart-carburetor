@@ -1,4 +1,4 @@
-import 'package:carburetor/carburetor.dart';
+import 'package:carburetor/module.dart';
 import 'package:carburetor/provide.dart';
 import 'package:example/src/example_base.carburetor.dart';
 

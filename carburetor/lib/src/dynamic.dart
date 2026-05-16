@@ -1,6 +1,5 @@
 import 'package:carburetor/exceptions.dart';
-
-import './module.dart';
+import 'package:carburetor/module.dart';
 
 part 'dynamic_impl.dart';
 
