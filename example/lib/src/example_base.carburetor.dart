@@ -7,7 +7,7 @@
 
 // ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name,type_literal_in_constant_pattern
 import 'package:carburetor/carburetor.dart';
-import 'package:carburetor/exception.dart';
+import 'package:carburetor/exceptions.dart';
 import 'package:example/src/example_base.dart' as aa;
 
 mixin $SampleModuleImplementation on CarburetorModule {

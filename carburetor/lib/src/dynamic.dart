@@ -1,4 +1,4 @@
-import 'package:carburetor/exception.dart';
+import 'package:carburetor/exceptions.dart';
 
 import './module.dart';
 

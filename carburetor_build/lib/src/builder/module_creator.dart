@@ -25,7 +25,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
       '// ignore_for_file: non_constant_identifier_names,unnecessary_constructor_name,type_literal_in_constant_pattern',
     );
     output.writeln('import \'package:carburetor/carburetor.dart\';');
-    output.writeln('import \'package:carburetor/exception.dart\';');
+    output.writeln('import \'package:carburetor/exceptions.dart\';');
     for (final MapEntry(key: import, value: alias) in context.getPackageImportMapping().entries) {
       output
         ..write('import \'')
