@@ -1,5 +1,5 @@
 import 'package:build/build.dart';
-import 'package:carburetor/carburetor.dart';
+import 'package:carburetor/provide.dart';
 import 'package:carburetor_build/src/model/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 

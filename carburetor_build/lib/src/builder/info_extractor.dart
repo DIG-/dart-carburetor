@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
-import 'package:carburetor/carburetor.dart';
+import 'package:carburetor/provide.dart';
 import 'package:carburetor_build/src/model/json.dart';
 import 'package:carburetor_build/src/model/provide.dart';
 import 'package:source_gen/source_gen.dart';
