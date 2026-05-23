@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:carburetor/provide.dart';
@@ -30,7 +31,7 @@ class InfoExtractorBuilder extends Builder {
 
   Stream<Json> _generateForLibrary(LibraryReader library, BuildStep buildStep) async* {
     final generator = library
-        .annotatedWith(TypeChecker.typeNamed(Provide))
+        .annotatedWith(TypeChecker.typeNamed(CarburetorProvide))
         .map((e) => _generateForAnnotatedElement(library, e.element, e.annotation, buildStep))
         .toList(growable: false);
     for (final task in generator) {
@@ -55,11 +56,11 @@ class InfoExtractorBuilder extends Builder {
 
     final ann = annotation.objectValue;
     return ProvideInfo(
-      provide: Provide(
-        singleton: ann.getField('singleton')?.toBoolValue() ?? false,
-        lazy: ann.getField('lazy')?.toBoolValue() ?? false,
-        weak: ann.getField('weak')?.toBoolValue() ?? false,
-        async: ann.getField('async')?.toBoolValue() ?? false,
+      provide: CarburetorProvide(
+        singleton: ann.getInheritedField('singleton')?.toBoolValue() ?? false,
+        lazy: ann.getInheritedField('lazy')?.toBoolValue() ?? false,
+        weak: ann.getInheritedField('weak')?.toBoolValue() ?? false,
+        async: ann.getInheritedField('async')?.toBoolValue() ?? false,
       ),
       clazz: ProvideClass(name: element.name3!, uri: element.library2.uri),
       constructor: ProvideConstructor(
@@ -76,5 +77,19 @@ class InfoExtractorBuilder extends Builder {
             }).toList(),
       ),
     ).toJson();
+  }
+}
+
+extension on DartObject {
+  DartObject? getInheritedField(String name) {
+    DartObject? parent = this;
+    DartObject? value = getField(name);
+    while (value == null && parent != null) {
+      value = parent.getField(name);
+      if (value == null) {
+        parent = parent.getField('(super)');
+      }
+    }
+    return value;
   }
 }

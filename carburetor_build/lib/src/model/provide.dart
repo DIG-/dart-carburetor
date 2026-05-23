@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'provide.g.dart';
 
-class ProvideJsonConverter extends JsonConverter<Provide, Json> {
+class ProvideJsonConverter extends JsonConverter<CarburetorProvide, Json> {
   static const _kSingleton = 'singleton';
   static const _kLazy = 'lazy';
   static const _kWeak = 'weak';
@@ -14,7 +14,7 @@ class ProvideJsonConverter extends JsonConverter<Provide, Json> {
   const ProvideJsonConverter();
 
   @override
-  Json toJson(Provide provide) {
+  Json toJson(CarburetorProvide provide) {
     return {
       _kSingleton: provide.singleton,
       _kLazy: provide.lazy, //
@@ -24,8 +24,8 @@ class ProvideJsonConverter extends JsonConverter<Provide, Json> {
   }
 
   @override
-  Provide fromJson(Json json) {
-    return Provide(
+  CarburetorProvide fromJson(Json json) {
+    return CarburetorProvide(
       singleton: json[_kSingleton] as bool? ?? false,
       lazy: json[_kLazy] as bool? ?? false, //
       weak: json[_kWeak] as bool? ?? false, //
@@ -46,7 +46,7 @@ class AssetIdJsonConverter extends JsonConverter<AssetId, String> {
 
 @JsonSerializable(converters: [ProvideJsonConverter(), AssetIdJsonConverter()])
 class ProvideInfo {
-  final Provide provide;
+  final CarburetorProvide provide;
   final ProvideClass clazz;
   final ProvideConstructor constructor;
 

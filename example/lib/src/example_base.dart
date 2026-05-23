@@ -8,39 +8,39 @@ class SampleClass {
   const SampleClass(this.child);
 }
 
-@Provide(singleton: true)
+@Singleton()
 class SampleSingletonClass {
   const SampleSingletonClass();
 }
 
-@Provide(singleton: true, lazy: false)
+@Singleton(lazy: false)
 class SampleSingletonNonLazyClass {
   const SampleSingletonNonLazyClass();
 }
 
-@Provide(singleton: true, weak: true)
+@Singleton(weak: true)
 class SampleSingletonWeakClass {
   const SampleSingletonWeakClass();
 }
 
-@Provide(async: true)
+@Provide.async()
 class SampleAsyncClass {
   final SampleSingletonClass child;
   final SampleAsyncSingletonClass child2;
   const SampleAsyncClass(this.child, {required this.child2});
 }
 
-@Provide(async: true, singleton: true)
+@Singleton.async()
 class SampleAsyncSingletonClass {
   const SampleAsyncSingletonClass();
 }
 
-@Provide(async: true, singleton: true, lazy: false)
+@Singleton.async(lazy: false)
 class SampleAsyncSingletonNonLazyClass {
   const SampleAsyncSingletonNonLazyClass();
 }
 
-@Provide(async: true, singleton: true, weak: true)
+@Singleton.async(weak: true)
 class SampleAsyncSingletonWeakClass {
   const SampleAsyncSingletonWeakClass();
 }
