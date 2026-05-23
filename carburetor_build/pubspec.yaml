@@ -1,7 +1,9 @@
 name: carburetor_build
-description: A starting point for Dart libraries or applications.
+description: Build package for carburetor dependency injection code generation.
 version: 0.0.1
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/DIG-/dart-carburetor
+topics:
+  - builder
 
 environment:
   sdk: ^3.7.0
