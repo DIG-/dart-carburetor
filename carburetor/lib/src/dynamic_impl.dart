@@ -1,11 +1,21 @@
 part of 'dynamic.dart';
 
+/// Concrete implementation of [CarburetorDynamicModule].
+///
+/// Stores per-type, per-name overrides in [_overrides] and delegates any
+/// non-overridden resolution to the wrapped [module].
 final class CarburetorDynamicModuleImpl<Module extends CarburetorModule> extends CarburetorDynamicModule<Module> {
   @override
   final Module module;
 
+  /// Internal map of runtime overrides, keyed first by [Type] and then by an
+  /// optional name qualifier.
   final Map<Type, Map<String?, Object>> _overrides;
 
+  /// Creates a [CarburetorDynamicModuleImpl] wrapping [module].
+  ///
+  /// An optional pre-populated [_overrides] map may be supplied; it defaults
+  /// to an empty constant map.
   const CarburetorDynamicModuleImpl(this.module, [this._overrides = const {}]) : super._();
 
   @override

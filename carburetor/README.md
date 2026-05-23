@@ -122,6 +122,36 @@ class RemoteConfig {
 final settings = await MyModule.instance.getAsync<SettingsService>();
 ```
 
+## Migration Utility
+
+`CarburetorDynamicModule` is a wrapper that helps you migrate incrementally from a runtime dependency injection system to Carburetor's build-time approach.
+
+During migration, some dependencies may not yet be registered in a Carburetor-generated module. `CarburetorDynamicModule` lets you provide those dependencies at runtime by calling `set`, while all already-migrated dependencies are resolved normally through the underlying generated module. Once every dependency has been migrated, the wrapper can be removed and the generated module used directly.
+
+```dart
+import 'package:carburetor/dynamic.dart';
+
+final dynamic = CarburetorDynamicModule(appModule);
+
+// Provide a dependency that has not been migrated yet.
+dynamic.set<LegacyService>(legacyServiceInstance);
+
+// Resolved from the runtime override.
+final legacy = dynamic.get<LegacyService>();
+
+// Resolved by the underlying generated module.
+final migrated = dynamic.get<MigratedService>();
+```
+
+Once all dependencies are migrated:
+
+```dart
+// Remove the wrapper and use the generated module directly.
+final migrated = appModule.get<MigratedService>();
+```
+
+> `CarburetorDynamicModule` is also useful in tests to override specific dependencies without replacing the entire module.
+
 ## Roadmap
 
 The following features are planned for future releases:
