@@ -25,15 +25,15 @@ part 'dynamic_impl.dart';
 /// final service = dynamic.get<LegacyService>(); // returns legacyServiceInstance
 /// final other   = dynamic.get<MigratedService>(); // resolved by appModule
 /// ```
-sealed class CarburetorDynamicModule<Module extends CarburetorModule> implements CarburetorModule {
+sealed class CarburetorDynamicModule<Module_ extends CarburetorModule> implements CarburetorModule {
   const CarburetorDynamicModule._();
 
   /// Wraps [module] in a [CarburetorDynamicModule] that delegates all
   /// non-overridden resolutions to [module].
-  const factory CarburetorDynamicModule(Module module) = CarburetorDynamicModuleImpl;
+  const factory CarburetorDynamicModule(Module_ module) = CarburetorDynamicModuleImpl;
 
   /// The underlying module that handles non-overridden dependency resolutions.
-  Module get module;
+  Module_ get module;
 
   /// Returns the dependency of type [T], using the registered override when
   /// one exists, or falling back to [module].

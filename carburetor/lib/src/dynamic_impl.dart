@@ -4,9 +4,9 @@ part of 'dynamic.dart';
 ///
 /// Stores per-type, per-name overrides in [_overrides] and delegates any
 /// non-overridden resolution to the wrapped [module].
-final class CarburetorDynamicModuleImpl<Module extends CarburetorModule> extends CarburetorDynamicModule<Module> {
+final class CarburetorDynamicModuleImpl<Module_ extends CarburetorModule> extends CarburetorDynamicModule<Module_> {
   @override
-  final Module module;
+  final Module_ module;
 
   /// Internal map of runtime overrides, keyed first by [Type] and then by an
   /// optional name qualifier.
