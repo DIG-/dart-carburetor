@@ -1,0 +1,1 @@
+../../example/lib/src/example_base.dart
