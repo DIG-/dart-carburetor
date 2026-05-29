@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:carburetor/module.dart';
 import 'package:carburetor_build/src/model/creator_context.dart';
@@ -18,7 +17,7 @@ class ModuleCreatorGenerator extends GeneratorForAnnotation<Module> {
   static List<ProvideInfo> _providers = [];
 
   @override
-  Future<String?> generateForAnnotatedElement(Element2 element, ConstantReader annotation, BuildStep buildStep) async {
+  Future<String?> generateForAnnotatedElement(final element, ConstantReader annotation, BuildStep buildStep) async {
     final output = StringBuffer();
     final context = CreatorContext.fromProviders(await _loadProviders(buildStep));
     output.writeln(

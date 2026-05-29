@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:analyzer/dart/constant/value.dart';
-import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:carburetor/provide.dart';
+import 'package:carburetor_build/src/analyzer_proxy.dart';
 import 'package:carburetor_build/src/model/json.dart';
 import 'package:carburetor_build/src/model/provide.dart';
 import 'package:source_gen/source_gen.dart';
@@ -44,16 +44,15 @@ class InfoExtractorBuilder extends Builder {
 
   Future<Json?> _generateForAnnotatedElement(
     LibraryReader library,
-    Element2 element,
+    ProxyElement element,
     ConstantReader annotation,
     BuildStep buildStep,
   ) async {
-    if (element is! ClassElement2) {
+    if (element is! ProxyClassElement) {
       throw Exception('Annotated element is not a class ($element)');
     }
     final constructor =
-        element.constructors2.where((c) => c.isDefaultConstructor).firstOrNull ?? element.constructors2.first;
-
+        element.constructorsProxy.where((c) => c.isDefaultConstructor).firstOrNull ?? element.constructorsProxy.first;
     final ann = annotation.objectValue;
     return ProvideInfo(
       provide: CarburetorProvide(
@@ -62,16 +61,16 @@ class InfoExtractorBuilder extends Builder {
         weak: ann.getInheritedField('weak')?.toBoolValue() ?? false,
         async: ann.getInheritedField('async')?.toBoolValue() ?? false,
       ),
-      clazz: ProvideClass(name: element.name3!, uri: element.library2.uri),
+      clazz: ProvideClass(name: element.nameProxy!, uri: element.libraryProxy!.uri),
       constructor: ProvideConstructor(
-        name: constructor.name3!,
+        name: constructor.nameProxy!,
         parameters:
             constructor.formalParameters.map((p) {
               return ProvideConstructorParameter(
-                name: p.isNamed ? p.name3 : null,
+                name: p.isNamed ? p.nameProxy : null,
                 type: ProvideClass(
-                  name: p.type.element3!.name3!,
-                  uri: p.type.element3!.library2!.uri, //
+                  name: p.type.elementProxy!.nameProxy!,
+                  uri: p.type.elementProxy!.libraryProxy!.uri, //
                 ),
               );
             }).toList(),
