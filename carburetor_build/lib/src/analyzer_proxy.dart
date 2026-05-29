@@ -1,20 +1,20 @@
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
-typedef ProxyElement = Element2;
-typedef ProxyClassElement = ClassElement2;
-typedef ProxyConstructorElement = ConstructorElement2;
-typedef ProxyLibraryElement = LibraryElement2;
+typedef ProxyElement = Element;
+typedef ProxyClassElement = ClassElement;
+typedef ProxyConstructorElement = ConstructorElement;
+typedef ProxyLibraryElement = LibraryElement;
 
 extension ProxyClassElementExtension on ProxyClassElement {
-  List<ProxyConstructorElement> get constructorsProxy => constructors2;
+  List<ProxyConstructorElement> get constructorsProxy => constructors;
 }
 
 extension ProxyElementExtension on ProxyElement {
-  String? get nameProxy => name3;
-  ProxyLibraryElement? get libraryProxy => library2;
+  String? get nameProxy => name;
+  ProxyLibraryElement? get libraryProxy => library;
 }
 
 extension ProxyDartTypeExtension on DartType {
-  ProxyElement? get elementProxy => element3;
+  ProxyElement? get elementProxy => element;
 }
