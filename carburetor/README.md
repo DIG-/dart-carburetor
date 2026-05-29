@@ -24,7 +24,7 @@ dart pub add --dev carburetor_build build_runner
 
 ### Versioning
 
-Carburetor follows a `x.y.z-w` versioning scheme:
+Carburetor builder follows a `x.y.z+w` versioning scheme:
 
 | Segment | Meaning |
 |---|---|
