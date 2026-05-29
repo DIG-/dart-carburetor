@@ -1,6 +1,6 @@
 name: carburetor_build
 description: Build package for carburetor dependency injection code generation.
-version: 0.0.2+1
+version: 0.0.2+0
 repository: https://github.com/DIG-/dart-carburetor
 topics:
   - builder
@@ -11,8 +11,8 @@ environment:
 resolution: workspace
 
 dependencies:
-  analyzer: ">=8.1.1 <14.0.0"
-  build: ">=4.0.2 <5.0.0"
+  analyzer: ">=7.4.0 <8.0.0"
+  build: ">=3.0.2 <4.0.0"
   carburetor: ^0.0.1
   source_gen: ">=3.1.0 <5.0.0"
   glob: ^2.1.0
