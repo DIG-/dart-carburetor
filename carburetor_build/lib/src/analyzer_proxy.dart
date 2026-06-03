@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/type.dart';
 
 typedef ProxyElement = Element;
 typedef ProxyClassElement = ClassElement;
+typedef ProxyExecutableElement = ExecutableElement;
 typedef ProxyConstructorElement = ConstructorElement;
 typedef ProxyLibraryElement = LibraryElement;
 

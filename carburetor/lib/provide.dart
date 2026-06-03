@@ -1,4 +1,7 @@
 import 'package:meta/meta_meta.dart';
+import 'src/constructor.dart' show CarburetorFactoryMethod;
+
+export 'src/constructor.dart' show CarburetorFactoryMethod;
 
 /// Base annotation class for all Carburetor provider annotations.
 ///
@@ -103,3 +106,5 @@ class SingletonAsync extends CarburetorProvide implements Singleton {
   ///   strong references remain.
   const SingletonAsync({super.lazy = true, super.weak = false}) : super(singleton: true, async: true);
 }
+
+typedef FactoryMethod = CarburetorFactoryMethod;
