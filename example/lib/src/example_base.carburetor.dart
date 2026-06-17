@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // ModuleCreatorGenerator
@@ -12,7 +12,7 @@ import 'package:example/src/example_base.dart' as aa;
 
 mixin $SampleModuleImplementation on CarburetorModule {
   aa.SampleClass _get_aa_SampleClass() {
-    return aa.SampleClass.new(_get_aa_SampleSingletonClass());
+    return aa.SampleClass.customFactory(_get_aa_SampleSingletonClass());
   }
 
   aa.SampleSingletonClass? _instance_aa_SampleSingletonClass;

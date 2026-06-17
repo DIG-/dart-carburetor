@@ -1,4 +1,7 @@
 import 'package:meta/meta_meta.dart';
+import 'src/constructor.dart' show CarburetorFactoryMethod;
+
+export 'src/constructor.dart' show CarburetorFactoryMethod;
 
 /// Base annotation class for all Carburetor provider annotations.
 ///
@@ -103,3 +106,17 @@ class SingletonAsync extends CarburetorProvide implements Singleton {
   ///   strong references remain.
   const SingletonAsync({super.lazy = true, super.weak = false}) : super(singleton: true, async: true);
 }
+
+/// Marks a constructor or factory method to be used for dependency instantiation
+/// instead of the default constructor.
+///
+/// By default, Carburetor uses the default constructor to create instances of
+/// annotated classes. Apply [FactoryMethod] to a named constructor or
+/// factory constructor to override this behavior.
+///
+/// All parameters required by the annotated constructor or method will be
+/// automatically resolved and injected by Carburetor at build time.
+///
+/// Only one [FactoryMethod] annotation may be applied per class.
+/// If multiple constructors or methods are annotated, the build will fail.
+typedef FactoryMethod = CarburetorFactoryMethod;

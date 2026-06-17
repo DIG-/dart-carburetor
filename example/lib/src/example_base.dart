@@ -5,7 +5,13 @@ import 'package:example/src/example_base.carburetor.dart';
 @Provide()
 class SampleClass {
   final SampleSingletonClass child;
-  const SampleClass(this.child);
+  final DummyClass dummy;
+  const SampleClass(this.child, this.dummy);
+
+  @FactoryMethod()
+  factory SampleClass.customFactory(SampleSingletonClass child) {
+    return SampleClass(child, const DummyClass());
+  }
 }
 
 @Singleton()
@@ -43,6 +49,10 @@ class SampleAsyncSingletonNonLazyClass {
 @Singleton.async(weak: true)
 class SampleAsyncSingletonWeakClass {
   const SampleAsyncSingletonWeakClass();
+}
+
+class DummyClass {
+  const DummyClass();
 }
 
 @Module()

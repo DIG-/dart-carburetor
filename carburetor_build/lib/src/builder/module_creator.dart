@@ -474,14 +474,21 @@ extension on StringSink {
         write(parameter.name);
         write(': ');
       }
-      if (context.getProvider(clazz: parameter.type).provide.async) {
-        if (!async) {
-          throw Exception(
-            'Cannot use an async provider as a dependency of a non-async provider.'
-            ' Class ${provider.clazz.name} requires ${parameter.type.name}',
-          );
+      try {
+        if (context.getProvider(clazz: parameter.type).provide.async) {
+          if (!async) {
+            throw Exception(
+              'Cannot use an async provider as a dependency of a non-async provider.'
+              ' Class ${provider.clazz.name} requires ${parameter.type.name}',
+            );
+          }
+          write('await ');
         }
-        write('await ');
+      } on ProviderNotFoundException catch (_) {
+        throw Exception(
+          'Failed to resolve dependencies for ${provider.clazz.name}. '
+          'Parameter \'${parameter.name}\' requires a provider of type ${parameter.type.name}, but none was found.',
+        );
       }
       writeClassGetterName(context: context, clazz: parameter.type);
       write('()');

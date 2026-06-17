@@ -7,7 +7,7 @@ import 'package:carburetor_build/src/builder/module_creator.dart';
 
 /// Builder for extracting information from Dart code.
 Builder carburetorInfoExtractor(BuilderOptions options) {
-  return InfoExtractorBuilder();
+  return InfoExtractorBuilder(options: options);
 }
 
 /// Builder for merging extracted information.

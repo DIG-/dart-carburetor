@@ -1,6 +1,6 @@
 name: carburetor
 description: Dependency injection library for Dart with code generation.
-version: 0.0.2
+version: 0.1.0
 repository: https://github.com/DIG-/dart-carburetor
 topics:
   - dependency-injection

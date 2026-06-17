@@ -3,7 +3,10 @@ import 'package:analyzer/dart/element/type.dart';
 
 typedef ProxyElement = Element2;
 typedef ProxyClassElement = ClassElement2;
+typedef ProxyExecutableElement = ExecutableElement2;
+typedef ProxyInstanceElement = InstanceElement2;
 typedef ProxyConstructorElement = ConstructorElement2;
+typedef ProxyMethodElement = MethodElement2;
 typedef ProxyLibraryElement = LibraryElement2;
 
 extension ProxyClassElementExtension on ProxyClassElement {
@@ -13,6 +16,10 @@ extension ProxyClassElementExtension on ProxyClassElement {
 extension ProxyElementExtension on ProxyElement {
   String? get nameProxy => name3;
   ProxyLibraryElement? get libraryProxy => library2;
+}
+
+extension ProxyInstanceElementExtension on ProxyInstanceElement {
+  List<ProxyMethodElement> get methodsProxy => methods2;
 }
 
 extension ProxyDartTypeExtension on DartType {

@@ -10,7 +10,14 @@ import 'package:carburetor_build/src/model/provide.dart';
 import 'package:source_gen/source_gen.dart';
 
 class InfoExtractorBuilder extends Builder {
-  InfoExtractorBuilder();
+  InfoExtractorBuilder({required this.options});
+
+  static const _kProvideChecker = TypeChecker.typeNamed(CarburetorProvide);
+  static const _kFactoryChecker = TypeChecker.typeNamed(CarburetorFactoryMethod);
+
+  final BuilderOptions options;
+
+  late final bool shouldCheckStaticMethodsForFactory = options.config['checkStaticMethodsForFactory'] ?? false;
 
   @override
   final Map<String, List<String>> buildExtensions = const {
@@ -31,7 +38,7 @@ class InfoExtractorBuilder extends Builder {
 
   Stream<Json> _generateForLibrary(LibraryReader library, BuildStep buildStep) async* {
     final generator = library
-        .annotatedWith(TypeChecker.typeNamed(CarburetorProvide))
+        .annotatedWith(_kProvideChecker)
         .map((e) => _generateForAnnotatedElement(library, e.element, e.annotation, buildStep))
         .toList(growable: false);
     for (final task in generator) {
@@ -51,8 +58,7 @@ class InfoExtractorBuilder extends Builder {
     if (element is! ProxyClassElement) {
       throw Exception('Annotated element is not a class ($element)');
     }
-    final constructor =
-        element.constructorsProxy.where((c) => c.isDefaultConstructor).firstOrNull ?? element.constructorsProxy.first;
+    final constructor = extractConstructor(element);
     final ann = annotation.objectValue;
     return ProvideInfo(
       provide: CarburetorProvide(
@@ -76,6 +82,25 @@ class InfoExtractorBuilder extends Builder {
             }).toList(),
       ),
     ).toJson();
+  }
+
+  ProxyExecutableElement extractConstructor(ProxyClassElement clazz) {
+    if (shouldCheckStaticMethodsForFactory) {
+      final fromStatic = clazz.methodsProxy.where((m) => m.isStatic && _kFactoryChecker.hasAnnotationOf(m)).firstOrNull;
+      if (fromStatic != null) {
+        if (fromStatic.returnType != clazz.thisType) {
+          throw Exception(
+            'Factory method for ${clazz.nameProxy} must return the same type as the class. But ${fromStatic.returnType} was found.',
+          );
+        }
+        return fromStatic;
+      }
+    }
+    final fromConstructor = clazz.constructorsProxy.where((c) => _kFactoryChecker.hasAnnotationOf(c)).firstOrNull;
+    if (fromConstructor != null) {
+      return fromConstructor;
+    }
+    return clazz.constructorsProxy.where((c) => c.isDefaultConstructor).firstOrNull ?? clazz.constructorsProxy.first;
   }
 }
 
