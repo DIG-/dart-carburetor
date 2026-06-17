@@ -86,7 +86,7 @@ class InfoExtractorBuilder extends Builder {
 
   ProxyExecutableElement extractConstructor(ProxyClassElement clazz) {
     if (shouldCheckStaticMethodsForFactory) {
-      final fromStatic = clazz.methods.where((m) => m.isStatic && _kFactoryChecker.hasAnnotationOf(m)).firstOrNull;
+      final fromStatic = clazz.methodsProxy.where((m) => m.isStatic && _kFactoryChecker.hasAnnotationOf(m)).firstOrNull;
       if (fromStatic != null) {
         if (fromStatic.returnType != clazz.thisType) {
           throw Exception(
