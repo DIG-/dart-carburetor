@@ -100,6 +100,7 @@ void main() {
 | `@Singleton.async()` | Async singleton, resolved lazily |
 | `@Singleton.async(lazy: false)` | Async singleton, resolved eagerly |
 | `@Singleton.async(weak: true)` | Async singleton held via a `WeakReference` |
+| `@FactoryMethod()` | Marks a constructor or factory method to use instead of the default constructor |
 | `@Module()` | Marks a class as a dependency module |
 
 ## Async Dependencies
@@ -121,6 +122,34 @@ class RemoteConfig {
 // Resolve:
 final settings = await MyModule.instance.getAsync<SettingsService>();
 ```
+
+## Custom Constructors and Factory Methods
+
+By default, Carburetor uses the default constructor to instantiate your dependencies. You can override this behavior using the `@FactoryMethod()` annotation to specify a named constructor or factory method:
+
+```dart
+@Provide()
+class DatabaseConnection {
+  final String host;
+  final int port;
+  
+  const DatabaseConnection(this.host, this.port);
+  
+  @FactoryMethod()
+  factory DatabaseConnection.fromConfig(ConfigService config) {
+    return DatabaseConnection(config.dbHost, config.dbPort);
+  }
+}
+
+// Carburetor will use DatabaseConnection.fromConfig() instead of the default constructor
+final db = MyModule.instance.get<DatabaseConnection>();
+```
+
+The `@FactoryMethod()` annotation can be applied to:
+- Named constructors
+- Factory constructors
+- Static factory methods (not recommended and requires setting flag `checkStaticMethodsForFactory: true` for builder `carburetor_info_extractor` )
+
 
 ## Migration Utility
 
@@ -157,7 +186,6 @@ final migrated = appModule.get<MigratedService>();
 The following features are planned for future releases:
 
 - **Deferred import support** — allow providers to be loaded lazily via Dart's deferred imports, reducing initial load time
-- **Named constructor support** — resolve dependencies using constructors other than the default one
 - **Inheritance-based injection** — declare a provider for a supertype and have it automatically injected wherever the supertype is required
 - **Generic type injection** — support dependency resolution for generic classes (e.g. `Repository<User>` and `Repository<Product>` as distinct bindings)
 

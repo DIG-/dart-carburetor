@@ -10,10 +10,10 @@ environment:
 resolution: workspace
 
 dependencies:
-  carburetor: ^0.0.1
+  carburetor: ^0.1.0
 
 dev_dependencies:
   lints: ^5.0.0
   build_runner: ^2.3.0
-  carburetor_build: ^0.0.1
+  carburetor_build: ^0.1.0
   test: ^1.26.0
